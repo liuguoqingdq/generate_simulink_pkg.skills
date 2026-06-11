@@ -1,0 +1,6 @@
+interface:
+  display_name: "机器人仿真控制工程验证"
+  short_description: "检查 URDF、ros2_control、动力学和接口一致性"
+  default_prompt: "使用 robot-sim-control-package-validation，检查机器人包的 URDF、ros2_control、动力学和接口一致性。"
+policy:
+  allow_implicit_invocation: true

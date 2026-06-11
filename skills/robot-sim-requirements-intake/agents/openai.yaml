@@ -1,0 +1,6 @@
+interface:
+  display_name: "机器人仿真需求整理"
+  short_description: "把粗略机器人想法整理成 robot_spec.yaml"
+  default_prompt: "使用 robot-sim-requirements-intake，把粗略机器人想法整理成 robot_spec.yaml、缺失信息清单和给 Codex 的生成提示词。"
+policy:
+  allow_implicit_invocation: true

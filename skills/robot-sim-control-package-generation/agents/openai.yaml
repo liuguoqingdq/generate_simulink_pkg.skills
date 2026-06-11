@@ -1,0 +1,6 @@
+interface:
+  display_name: "机器人仿真控制工程生成"
+  short_description: "根据 robot_spec.yaml 生成 ROS2/Gazebo/Simscape 工程包"
+  default_prompt: "使用 robot-sim-control-package-generation，根据 robot_spec.yaml 生成工程化机器人仿真与控制包。"
+policy:
+  allow_implicit_invocation: true

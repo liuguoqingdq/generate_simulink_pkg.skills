@@ -1,0 +1,83 @@
+project:
+  name: diff_drive_robot
+  robot_type: diff_drive
+  goal: [ros2_control_deployment, gazebo_validation]
+  target_platforms:
+    ros2: {distro: humble, ubuntu: "22.04"}
+    simulation: [gazebo]
+    control_runtime: [cpp_ros2_control]
+frames:
+  convention: ros
+  base_link: base_link
+  axes: {x: forward, y: left, z: up}
+links:
+  - name: base_link
+    role: base_frame
+    moving: false
+    source: estimated
+    geometry: {visual: {type: box, size: [0.36, 0.28, 0.12]}, collision: {type: box, size: [0.36, 0.28, 0.12]}}
+    inertial: {mass: 5.0, com_xyz: [0, 0, 0], inertia: auto_box}
+  - name: left_wheel_link
+    role: wheel
+    moving: true
+    source: estimated
+    geometry: {visual: {type: cylinder, radius: 0.08, length: 0.03}, collision: {type: cylinder, radius: 0.08, length: 0.03}}
+    inertial: {mass: 0.35, com_xyz: [0, 0, 0], inertia: auto_cylinder}
+  - name: right_wheel_link
+    role: wheel
+    moving: true
+    source: estimated
+    geometry: {visual: {type: cylinder, radius: 0.08, length: 0.03}, collision: {type: cylinder, radius: 0.08, length: 0.03}}
+    inertial: {mass: 0.35, com_xyz: [0, 0, 0], inertia: auto_cylinder}
+joints:
+  - name: left_wheel_joint
+    type: continuous
+    source: estimated
+    parent: base_link
+    child: left_wheel_link
+    origin_xyz: [0.0, 0.15, 0.0]
+    origin_rpy: [0, 0, 0]
+    axis: [0, 1, 0]
+    limit: {effort: 10.0, velocity: 30.0}
+    dynamics: {damping: 0.03, friction: 0.01}
+  - name: right_wheel_joint
+    type: continuous
+    source: estimated
+    parent: base_link
+    child: right_wheel_link
+    origin_xyz: [0.0, -0.15, 0.0]
+    origin_rpy: [0, 0, 0]
+    axis: [0, 1, 0]
+    limit: {effort: 10.0, velocity: 30.0}
+    dynamics: {damping: 0.03, friction: 0.01}
+actuators:
+  - {name: left_wheel_motor, joint: left_wheel_joint, source: estimated, command_interface: velocity, state_interfaces: [position, velocity], effort_limit: 10.0, velocity_limit: 30.0}
+  - {name: right_wheel_motor, joint: right_wheel_joint, source: estimated, command_interface: velocity, state_interfaces: [position, velocity], effort_limit: 10.0, velocity_limit: 30.0}
+control:
+  controller_type: diff_drive_controller
+  command_input: cmd_vel
+  output: wheel_velocity
+  sample_time_s: 0.01
+simulation:
+  plant_input: velocity
+  plant_output: [wheel_position, wheel_velocity, odom]
+  dynamic_simulation_required: true
+  collision_required: true
+  inertial_required: true
+  gazebo: {use_gazebo_ros2_control: true, use_sensor_plugins: false}
+ros2_control:
+  hardware_plugin: gazebo_ros2_control/GazeboSystem
+  joints:
+    - {name: left_wheel_joint, command_interfaces: [velocity], state_interfaces: [position, velocity]}
+    - {name: right_wheel_joint, command_interfaces: [velocity], state_interfaces: [position, velocity]}
+  controllers: {joint_state_broadcaster: true, diff_drive_controller: true}
+outputs:
+  required_files: [params/robot_spec.yaml, urdf/robot.urdf.xacro, config/ros2_control.xacro, config/controllers.yaml, launch/sim.launch.py, scripts/validate_robot_package.py, README.md]
+validation:
+  generate_validate_script: true
+  check_urdf: true
+  check_joint_name_consistency: true
+  check_inertial_collision: true
+  check_limits_dynamics: true
+  check_interface_contract: true
+forbidden: [toy_demo, readme_only, hardcoded_scattered_params, missing_inertial, missing_collision, fake_position_animation]
